@@ -113,14 +113,16 @@ ${user.getSipNumber() > 0 ? user.getSipNumber() : "you don't set sip phone"})
         <tr>
         <td><c:out value="${event.getFormatDate()}"/> </td>
         <td><c:out value="${event.getDescription()}"/> </td>
-        <td><input class="notify-event" type="checkbox" name=${event.getId()} value="checked"
+        <td><input class="notify-event" type="checkbox" name="notify-${event.getId()}" value="checked"
         ${event.isNotified() ? "checked" : ""}> </td>
-        <td class="form-inline"><input type="checkbox" class="auto-call-checkbox" name=${event.getId()} ${event.isAutoCall() ? "checked" : ""} value="checked" />
-        <input type="text" id="conf-${event.getId()}" class="conf-number form-control input-sm" name="conf-number" ${event.isAutoCall() ? "" : "disabled"}/>
+        <td class="form-inline"><input type="checkbox" class="auto-call-checkbox" name="auto-${event.getId()}" ${event.isAutoCall() ? "checked" : ""} value="checked" />
+        <input type="text" id="conf-${event.getId()}" class="conf-number form-control input-sm"
+        name="conf-${event.getId()}" value="${event.getConferenceNumber() != 0 ? event.getConferenceNumber() : ''}" ${event.isAutoCall() ? "" : "disabled"}/>
         </td>
         </tr>
         </c:forEach>
         </table>
+        <button type="button" class="btn btn-sm btn-primary" data-toggle="modal" data-target=".bs-new-event-modal-sm">Add new event</button>
         <button type="button" onclick="setNotifyEvents()" class="btn btn-default pull-right">Save</button>
         </form>
         </c:otherwise>
@@ -130,6 +132,39 @@ ${user.getSipNumber() > 0 ? user.getSipNumber() : "you don't set sip phone"})
         </div>
         </div>
         </div>
+
+        <%--modal window add new event--%>
+        <div class="modal fade bs-new-event-modal-sm" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-sm">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="myModalLabel">Add new event</h4>
+                    </div>
+                    <div class="modal-body">
+                        <form id="newEventForm" class="form-signin" action="/new-event" method="post">
+                            <div class="form-group">
+                                <label for="description">Description</label>
+                                <input type="text" class="form-control" id="description"
+                                       name="description"
+                                               placeholder="my super important meeting">
+                            </div>
+                            <div class="form-group">
+                                <label for="date">Date and time</label>
+                                <input type="text" class="form-control" id="date"
+                                       name="date-time"
+                                       placeholder="2015-14-09 12:30:00">
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        <button type="button" onclick="submitNewEventForm()" class="btn btn-primary">Save changes</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <%--end modal window--%>
 
         <footer class="footer">
                 <div class="container">

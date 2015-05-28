@@ -25,6 +25,7 @@ public class EventMapper implements RowMapper<Event>
         event.setNotified(aResultSet.getBoolean("notified"));
         event.setAutoCall(aResultSet.getBoolean("auto_call"));
         event.setConferenceNumber(aResultSet.getInt("conference_number"));
+        event.setCustom(aResultSet.getBoolean("custom"));
         return event;
     }
 }

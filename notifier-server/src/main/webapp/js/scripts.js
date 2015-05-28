@@ -1,9 +1,10 @@
-var form = document.getElementById("settingsForm");
+
 var saveEventsForm = document.getElementById("saveEventsForm");
 
 $(".auto-call-checkbox").each(function () {
     $(this).change(function (target) {
-        var eventId = $(this).attr('name');
+        var nameAttr = $(this).attr('name');
+        var eventId = nameAttr.substring(nameAttr.indexOf("-") + 1);
         var checked = $(this).prop('checked');
         console.log("eventId :", eventId);
 
@@ -19,7 +20,12 @@ $(".auto-call-checkbox").each(function () {
 
 function submitSettingsForm() {
     console.log("submit settings form");
-    form.submit();
+    $("#settingsForm").submit();
+}
+
+function submitNewEventForm() {
+    console.log("submit new event form");
+    $("#newEventForm").submit();
 }
 
 function setNotifyEvents() {

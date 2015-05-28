@@ -17,7 +17,10 @@
 package com.ericpol.notifier.web;
 
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -26,6 +29,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -119,6 +123,30 @@ public class MainController
         return "redirect:/";
     }
 
+    @RequestMapping(value = "/new-event", method = RequestMethod.POST)
+    public String newEvent(@RequestParam(value = "description", defaultValue = "none") String aDescription,
+                           @RequestParam(value = "date-time") String aDate, Map<String, Object> model) throws ParseException {
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String name = auth.getName();
+        Date date =  new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(aDate);
+
+        final User user = userDAO.getUser(name);
+        final Event newEvent = new Event();
+        newEvent.setUID("custom");
+        newEvent.setDescription(aDescription);
+        newEvent.setDate(date);
+        newEvent.setNotified(true);
+        newEvent.setCustom(true);
+        newEvent.setIdUser(user.getId());
+        userDAO.createEvent(newEvent);
+
+
+        LOGGER.info("new event {}, date {}", aDescription, aDate);
+
+        return "redirect:/";
+    }
+
     @RequestMapping(value = "/save-events", method = RequestMethod.POST)
     public String saveEvents(@RequestParam Map<String, String> allRequestParams, Model model) throws IOException,
             SchedulerException
@@ -129,12 +157,7 @@ public class MainController
         String name = auth.getName();
 
         final User user = userDAO.getUser(name);
-
-        userDAO.setCheckedEvent(user, allRequestParams.keySet());
-        for (String eachParam : allRequestParams.keySet())
-        {
-            LOGGER.info("param {} - {}", eachParam, allRequestParams.get(eachParam));
-        }
+        userDAO.setEventsSettings(user, allRequestParams);
 
         return "redirect:/";
     }

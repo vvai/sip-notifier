@@ -1,6 +1,5 @@
 package com.ericpol.notifier.data.impl;
 
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -129,12 +128,13 @@ public class UserDAOImpl implements UserDAO
         return itsJdbcTemplateObject.queryForObject(sql, new Object[] {aUid}, new EventMapper());
     }
 
+
     @Override
     public final void createEvent(final Event anEvent)
     {
-        String sql = "insert into event (uid, description, date, notified, iduser) values (?, ?, ?, ?, ?)";
+        String sql = "insert into event (uid, description, date, notified, iduser, custom) values (?, ?, ?, ?, ?, ?)";
         itsJdbcTemplateObject.update(sql, anEvent.getUID(), anEvent.getDescription(), anEvent.getDate(),
-                anEvent.isNotified(), anEvent.getIdUser());
+                anEvent.isNotified(), anEvent.getIdUser(), anEvent.isCustom());
     }
 
     @Override
@@ -159,14 +159,44 @@ public class UserDAOImpl implements UserDAO
     }
 
     @Override
-    public final void setCheckedEvent(final User aUser, final Collection<String> aNotifiedUids)
+    public final void setEventsSettings(final User aUser, final Map<String, String> aProperties)
     {
-        String sql = "update event set notified=false where iduser=?";
-        itsJdbcTemplateObject.update(sql, aUser.getId());
-        for (String eachEvent : aNotifiedUids)
+        resetUserEventSettings(aUser);
+        for (String eachProperty : aProperties.keySet())
         {
-            String eventSql = "update event set notified=1 where idevent = ?";
-            itsJdbcTemplateObject.update(eventSql, eachEvent);
+            final String eventId = getEventId(eachProperty);
+            if (eachProperty.contains("notify"))
+            {
+                notifyEvent(eventId);
+            }
+            else if (eachProperty.contains("conf"))
+            {
+                final String conferenceNumber = aProperties.get(eachProperty);
+                setConferenceNumber(eventId, conferenceNumber);
+            }
         }
+    }
+
+    private final String getEventId(String anParamName)
+    {
+        return anParamName.substring(anParamName.indexOf('-') + 1);
+    }
+
+    private final void resetUserEventSettings(final User aUser)
+    {
+        String sql = "update event set notified=false, auto_call=false, conference_number=NULL where iduser=?";
+        itsJdbcTemplateObject.update(sql, aUser.getId());
+    }
+
+    private final void notifyEvent(final String anEventId)
+    {
+        String sql = "update event set notified=1 where idevent = ?";
+        itsJdbcTemplateObject.update(sql, anEventId);
+    }
+
+    private final void setConferenceNumber(final String anEventId, final String aConferenceNumber)
+    {
+        String sql = "update event set auto_call=1, conference_number=? where idevent=?";
+        itsJdbcTemplateObject.update(sql, aConferenceNumber, anEventId);
     }
 }

@@ -25,6 +25,7 @@ public class Event implements Comparable<Event>
     private boolean itsNotified;
     private boolean itsAutoCall;
     private int itsConferenceNumber;
+    private boolean itsCustom;
 
     public final int getId()
     {
@@ -104,6 +105,16 @@ public class Event implements Comparable<Event>
     public final void setConferenceNumber(final int aConferenceNumber)
     {
         this.itsConferenceNumber = aConferenceNumber;
+    }
+
+    public final boolean isCustom()
+    {
+        return this.itsCustom;
+    }
+
+    public void setCustom(final boolean aCustom)
+    {
+        this.itsCustom = aCustom;
     }
 
     /**

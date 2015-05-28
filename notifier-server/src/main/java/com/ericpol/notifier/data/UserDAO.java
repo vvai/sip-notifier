@@ -3,6 +3,7 @@ package com.ericpol.notifier.data;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import com.ericpol.notifier.model.Event;
 import com.ericpol.notifier.model.User;
@@ -37,5 +38,5 @@ public interface UserDAO
 
     void deletePastEvents();
 
-    void setCheckedEvent(User aUser, Collection<String> aNotifiedUids);
+    void setEventsSettings(User aUser, Map<String, String> aNotifiedUids);
 }
